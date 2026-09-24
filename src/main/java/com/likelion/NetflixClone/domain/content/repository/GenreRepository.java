@@ -1,4 +1,10 @@
 package com.likelion.NetflixClone.domain.content.repository;
 
-public class GenreRepository {
+import com.likelion.NetflixClone.domain.content.entity.Genre;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Optional;
+
+public interface GenreRepository extends JpaRepository<Genre, Long> {
+    Optional<Genre> findByName(String name);
 }

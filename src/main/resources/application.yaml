@@ -1,3 +1,55 @@
+server:
+  port: 8080
+
 spring:
   application:
-    name: NetflixClone
+    name: netflix-clone
+
+  # 1. 데이터베이스 연결 설정 (MySQL 기준)
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    # 로컬 MySQL 서버 정보 및 DB 이름(netflix_db) 입력
+    url: jdbc:mysql://localhost:3306/netflix_db?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
+    username: root
+    password: root
+
+  # 2. JPA & Hibernate 설정
+  jpa:
+    hibernate:
+      # ddl-auto 옵션:
+      # create: 기존 테이블 삭제 후 재생성 (개발 초기용)
+      # update: 변경된 스키마 반영 (권장)
+      # validate: 엔티티와 테이블이 정상 매핑되었는지만 검증
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true # 실행되는 SQL을 보기 좋게 정렬
+        show_sql: true   # 실행되는 SQL 쿼리 콘솔 출력
+        default_batch_fetch_size: 100 # N+1 문제 완화를 위한 Batch Size 설정
+    open-in-view: false # OSIV 비활성화 (성능 향상 및 트랜잭션 범위 명확화)
+
+# 3. JWT 커스텀 설정
+jwt:
+  # HS256 알고리즘 사용 시 최소 256비트(32자 이상)의 보안 키 문자열이 필요합니다.
+  secret: your-256-bit-secret-key-netflix-clone-project-secure-key-12345
+  # Access Token 유효 시간 (밀리초 단위: 3600000ms = 1시간)
+  access-token-expiration-ms: 3600000
+  # Refresh Token 유효 시간 (밀리초 단위: 1209600000ms = 14일)
+  refresh-token-expiration-ms: 1209600000
+
+# 4. Swagger (Springdoc OpenAPI) 설정
+springdoc:
+  springdoc:
+    swagger-ui:
+      path: /swagger-ui.html           # 접속 경로: http://localhost:8080/swagger-ui.html
+      groups-order: DESC               # 그룹 표시 순서
+      operations-sorter: method        # API 태그 내 메서드 정렬 (GET, POST ...)
+      disable-swagger-default-url: true # 기본 URL 비활성화
+    api-docs:
+      path: /v3/api-docs               # OpenAPI 명세서 JSON 경로
+
+    default-consumes-media-type: application/json
+    default-produces-media-type: application/json
+    model-converters:
+      pageable-converter:
+        enabled: true
