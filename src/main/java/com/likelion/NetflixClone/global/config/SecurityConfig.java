@@ -59,6 +59,14 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/v1/contents/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/contents/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
+                        // 4주차
+                        .requestMatchers("/api/v1/wishlist/**").authenticated() // 찜하기는 로그인된 유저 누구나
+                        .requestMatchers(HttpMethod.POST, "/api/v1/images/**").hasRole("ADMIN") // 이미지 업로드는 ADMIN
+
+                        .requestMatchers(HttpMethod.POST, "/api/v1/contents/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/contents/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/contents/**").hasRole("ADMIN")
+                        .anyRequest().authenticated()
                 )
 
                 // 4. JWT 필터 위치 지정
