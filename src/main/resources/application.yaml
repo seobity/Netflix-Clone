@@ -28,6 +28,12 @@ spring:
         default_batch_fetch_size: 100 # N+1 문제 완화를 위한 Batch Size 설정
     open-in-view: false # OSIV 비활성화 (성능 향상 및 트랜잭션 범위 명확화)
 
+    #  파일 업로드 용량 제한 설정 (기본값: 1MB -> 10MB / 10MB -> 50MB로 변경)
+    servlet:
+      multipart:
+        max-file-size: 10MB      # 파일 단건 최대 용량 (예: 10MB)
+        max-request-size: 50MB   # 한 번의 요청 전체 최대 용량 (예: 50MB)
+
 # 3. JWT 커스텀 설정
 jwt:
   # HS256 알고리즘 사용 시 최소 256비트(32자 이상)의 보안 키 문자열이 필요합니다.
