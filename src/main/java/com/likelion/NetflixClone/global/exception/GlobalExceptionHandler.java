@@ -1,26 +1,53 @@
 package com.likelion.NetflixClone.global.exception;
 
-import org.springframework.http.HttpStatus;
+import lombok.Builder;
+import lombok.Getter;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.Map;
+import java.time.LocalDateTime;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // IllegalArgumentException (잘못된 인자 요청, 예: 존재하지 않는 id 조회 등) 처리
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<Map<String, String>> handleIllegalArgumentException(IllegalArgumentException e) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(Map.of("error", e.getMessage()));
+    @ExceptionHandler(CustomException.class)
+    public ResponseEntity<ErrorResponse> handleCustomException(CustomException e) {
+        ErrorCode errorCode = e.getErrorCode();
+        ErrorResponse response = ErrorResponse.of(errorCode.getCode(), errorCode.getMessage());
+        return ResponseEntity.status(errorCode.getStatus()).body(response);
     }
 
-    // 파일 업로드 또는 기타 일반 예외 처리
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<Map<String, String>> handleRuntimeException(RuntimeException e) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(Map.of("error", e.getMessage()));
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        String message = e.getBindingResult().getAllErrors().get(0).getDefaultMessage();
+        ErrorResponse response = ErrorResponse.of(ErrorCode.INVALID_INPUT_VALUE.getCode(), message);
+        return ResponseEntity.status(ErrorCode.INVALID_INPUT_VALUE.getStatus()).body(response);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleException(Exception e) {
+        ErrorResponse response = ErrorResponse.of(
+                ErrorCode.INTERNAL_SERVER_ERROR.getCode(),
+                e.getMessage() != null ? e.getMessage() : ErrorCode.INTERNAL_SERVER_ERROR.getMessage()
+        );
+        return ResponseEntity.status(ErrorCode.INTERNAL_SERVER_ERROR.getStatus()).body(response);
+    }
+
+    @Getter
+    @Builder
+    public static class ErrorResponse {
+        private String code;
+        private String message;
+        private LocalDateTime timestamp;
+
+        public static ErrorResponse of(String code, String message) {
+            return ErrorResponse.builder()
+                    .code(code)
+                    .message(message)
+                    .timestamp(LocalDateTime.now())
+                    .build();
+        }
     }
 }

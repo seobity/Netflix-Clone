@@ -57,15 +57,14 @@ public class SecurityConfig {
                                 "/images/**" // 업로드된 정적 이미지 파일 접근 허용
                         ).permitAll()
 
-                        // 콘텐츠 관련 경로
                         .requestMatchers(HttpMethod.GET, "/api/v1/contents/**").permitAll()
+                        .requestMatchers("/api/v1/wishlist/**").authenticated()
+                        .requestMatchers("/api/v1/history/**").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/images/**").hasRole("ADMIN")
+
                         .requestMatchers(HttpMethod.POST, "/api/v1/contents/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/v1/contents/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/contents/**").hasRole("ADMIN")
-
-                        // 4주차 신규 기능 경로 (찜하기 & 이미지 업로드)
-                        .requestMatchers("/api/v1/wishlist/**").authenticated() // 찜하기는 로그인된 유저 누구나
-                        .requestMatchers(HttpMethod.POST, "/api/v1/images/**").hasRole("ADMIN") // 이미지 업로드는 ADMIN
 
                         .anyRequest().authenticated()
                 )
